@@ -1,0 +1,98 @@
+class BarcodeItem {
+  final String barcode;
+  final String itemName;
+  final String? brand;
+  final String? category;
+  final String? hsn;
+  final String? sku;
+  final double mrp;
+  final double salePrice;
+  final double purchasePrice;
+  final double? gstRate;
+  final String? unit;
+  final String? notes;
+  final String status;
+
+  BarcodeItem({
+    required this.barcode,
+    required this.itemName,
+    this.brand,
+    this.category,
+    this.hsn,
+    this.sku,
+    required this.mrp,
+    required this.salePrice,
+    required this.purchasePrice,
+    this.gstRate,
+    this.unit,
+    this.notes,
+    this.status = 'pending',
+  });
+
+  factory BarcodeItem.fromJson(Map<String, dynamic> json) {
+    return BarcodeItem(
+      barcode: json['barcode'],
+      itemName: json['name'] ?? json['item_name'] ?? '',
+      brand: json['brand'],
+      category: json['category'],
+      hsn: json['hsn'],
+      sku: json['sku'],
+      mrp: (json['mrp'] as num?)?.toDouble() ?? 0.0,
+      salePrice: (json['sale_price'] as num?)?.toDouble() ?? 0.0,
+      purchasePrice: (json['purchase_price'] as num?)?.toDouble() ?? 0.0,
+      gstRate: (json['gst_rate'] as num?)?.toDouble(),
+      unit: json['unit'],
+      notes: json['notes'],
+      status: json['status'] ?? 'pending',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'barcode': barcode,
+      'name': itemName,
+      'brand': brand,
+      'category': category,
+      'hsn': hsn,
+      'sku': sku,
+      'mrp': mrp,
+      'sale_price': salePrice,
+      'purchase_price': purchasePrice,
+      'gst_rate': gstRate,
+      'unit': unit,
+      'notes': notes,
+      'status': status,
+    };
+  }
+
+  BarcodeItem copyWith({
+    String? itemName,
+    String? brand,
+    String? category,
+    String? hsn,
+    String? sku,
+    double? mrp,
+    double? salePrice,
+    double? purchasePrice,
+    double? gstRate,
+    String? unit,
+    String? notes,
+    String? status,
+  }) {
+    return BarcodeItem(
+      barcode: this.barcode,
+      itemName: itemName ?? this.itemName,
+      brand: brand ?? this.brand,
+      category: category ?? this.category,
+      hsn: hsn ?? this.hsn,
+      sku: sku ?? this.sku,
+      mrp: mrp ?? this.mrp,
+      salePrice: salePrice ?? this.salePrice,
+      purchasePrice: purchasePrice ?? this.purchasePrice,
+      gstRate: gstRate ?? this.gstRate,
+      unit: unit ?? this.unit,
+      notes: notes ?? this.notes,
+      status: status ?? this.status,
+    );
+  }
+}
