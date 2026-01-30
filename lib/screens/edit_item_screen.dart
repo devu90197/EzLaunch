@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../models/barcode_item.dart';
 
 class EditItemScreen extends StatefulWidget {
@@ -12,11 +14,9 @@ class EditItemScreen extends StatefulWidget {
 class _EditItemScreenState extends State<EditItemScreen> {
   late TextEditingController _nameController;
   late TextEditingController _mrpController;
-  late TextEditingController _salePriceController;
-  late TextEditingController _purchasePriceController;
-  late TextEditingController _skuController;
   late TextEditingController _hsnController;
   late TextEditingController _brandController;
+  late TextEditingController _taxController;
   late TextEditingController _notesController;
 
   @override
@@ -24,63 +24,146 @@ class _EditItemScreenState extends State<EditItemScreen> {
     super.initState();
     _nameController = TextEditingController(text: widget.item.itemName);
     _mrpController = TextEditingController(text: widget.item.mrp.toString());
-    _salePriceController = TextEditingController(text: widget.item.salePrice.toString());
-    _purchasePriceController = TextEditingController(text: widget.item.purchasePrice.toString());
-    _skuController = TextEditingController(text: widget.item.sku);
     _hsnController = TextEditingController(text: widget.item.hsn);
     _brandController = TextEditingController(text: widget.item.brand);
+    _taxController = TextEditingController(text: widget.item.taxRate?.toString() ?? '0');
     _notesController = TextEditingController(text: widget.item.notes);
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _mrpController.dispose();
+    _hsnController.dispose();
+    _brandController.dispose();
+    _taxController.dispose();
+    _notesController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Item Details')),
+      backgroundColor: const Color(0xFFF8FAFC),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: const Icon(CupertinoIcons.back, color: Color(0xFF2563EB)),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text('Edit Item', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.black)),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionTitle('Basic Info'),
-            _buildField(_nameController, 'Item Name', Icons.shopping_bag_outlined),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(child: _buildField(_brandController, 'Brand', Icons.workspace_premium_outlined)),
-                const SizedBox(width: 16),
-                Expanded(child: _buildField(_skuController, 'SKU', Icons.tag)),
-              ],
+            // Barcode Header
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF2563EB).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  const Icon(CupertinoIcons.barcode, color: Color(0xFF2563EB), size: 24),
+                  const SizedBox(width: 12),
+                  Text(widget.item.barcode, style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 18, color: const Color(0xFF2563EB))),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
-            _buildField(_hsnController, 'HSN Code', Icons.numbers),
+            const SizedBox(height: 24),
             
-            const SizedBox(height: 32),
-            _buildSectionTitle('Pricing & Tax'),
-            Row(
-              children: [
-                Expanded(child: _buildField(_mrpController, 'MRP', Icons.currency_rupee, keyboardType: TextInputType.number)),
-                const SizedBox(width: 16),
-                Expanded(child: _buildField(_salePriceController, 'Sale Price', Icons.sell_outlined, keyboardType: TextInputType.number)),
-              ],
+            // Basic Info Section
+            Text('BASIC INFO', style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey[400], letterSpacing: 1.2)),
+            const SizedBox(height: 12),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
+              ),
+              child: Column(
+                children: [
+                  _buildCupertinoField('Item Name', _nameController, CupertinoIcons.bag),
+                  Divider(height: 1, color: Colors.grey[100]),
+                  _buildCupertinoField('Brand', _brandController, CupertinoIcons.tag),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
-            _buildField(_purchasePriceController, 'Purchase Price', Icons.shopping_cart_outlined, keyboardType: TextInputType.number),
+            const SizedBox(height: 24),
             
-            const SizedBox(height: 32),
-            _buildSectionTitle('Additional Details'),
-            _buildField(_notesController, 'Internal Notes (Optional)', Icons.notes, maxLines: 3),
+            // Pricing Section
+            Text('PRICING', style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey[400], letterSpacing: 1.2)),
+            const SizedBox(height: 12),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
+              ),
+              child: Column(
+                children: [
+                  _buildCupertinoField('MRP (Sale Price)', _mrpController, Icons.currency_rupee_rounded, isNumber: true),
+                  Divider(height: 1, color: Colors.grey[100]),
+                  _buildCupertinoField('Tax Rate (%)', _taxController, CupertinoIcons.percent, isNumber: true),
+                  Divider(height: 1, color: Colors.grey[100]),
+                  _buildCupertinoField('HSN Code', _hsnController, CupertinoIcons.number),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
             
-            const SizedBox(height: 48),
+            // Notes Section
+            Text('NOTES', style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey[400], letterSpacing: 1.2)),
+            const SizedBox(height: 12),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
+              ),
+              padding: const EdgeInsets.all(16),
+              child: CupertinoTextField(
+                controller: _notesController,
+                placeholder: 'Internal notes (optional)',
+                placeholderStyle: GoogleFonts.outfit(color: Colors.grey[400]),
+                style: GoogleFonts.outfit(),
+                maxLines: 3,
+                decoration: null,
+                padding: EdgeInsets.zero,
+              ),
+            ),
+            
+            const SizedBox(height: 40),
+            
+            // Save Button
             SizedBox(
               width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
+              child: CupertinoButton(
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                color: const Color(0xFF2563EB),
+                borderRadius: BorderRadius.circular(14),
                 onPressed: _save,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6366F1),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                ),
-                child: const Text('Save Changes', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                child: Text('Save Changes', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 17)),
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            // Cancel Button
+            SizedBox(
+              width: double.infinity,
+              child: CupertinoButton(
+                padding: const EdgeInsets.symmetric(vertical: 18),
+                color: const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(14),
+                onPressed: () => Navigator.pop(context),
+                child: Text('Cancel', style: GoogleFonts.outfit(color: const Color(0xFF64748B), fontWeight: FontWeight.w600, fontSize: 17)),
               ),
             ),
           ],
@@ -89,45 +172,49 @@ class _EditItemScreenState extends State<EditItemScreen> {
     );
   }
 
-  void _save() {
-    final updatedItem = widget.item.copyWith(
-      itemName: _nameController.text,
-      brand: _brandController.text,
-      sku: _skuController.text,
-      hsn: _hsnController.text,
-      mrp: double.tryParse(_mrpController.text) ?? 0,
-      salePrice: double.tryParse(_salePriceController.text) ?? 0,
-      purchasePrice: double.tryParse(_purchasePriceController.text) ?? 0,
-      notes: _notesController.text,
-    );
-    Navigator.pop(context, updatedItem);
-  }
-
-  Widget _buildSectionTitle(String title) {
+  Widget _buildCupertinoField(String label, TextEditingController controller, IconData icon, {bool isNumber = false}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
         children: [
-          Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(width: 8),
-          const Expanded(child: Divider()),
+          Icon(icon, size: 22, color: Colors.grey[400]),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: GoogleFonts.outfit(fontSize: 12, color: Colors.grey[500])),
+                const SizedBox(height: 4),
+                CupertinoTextField(
+                  controller: controller,
+                  placeholder: 'Enter $label',
+                  placeholderStyle: GoogleFonts.outfit(color: Colors.grey[300]),
+                  style: GoogleFonts.outfit(fontSize: 16),
+                  keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+                  decoration: null,
+                  padding: EdgeInsets.zero,
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildField(TextEditingController controller, String label, IconData icon, {TextInputType? keyboardType, int maxLines = 1}) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, size: 20),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        filled: true,
-        fillColor: Colors.grey[50],
-      ),
+  void _save() {
+    final mrp = double.tryParse(_mrpController.text) ?? 0;
+    final taxRate = double.tryParse(_taxController.text) ?? 0;
+    final updatedItem = widget.item.copyWith(
+      itemName: _nameController.text,
+      brand: _brandController.text,
+      hsn: _hsnController.text,
+      mrp: mrp,
+      salePrice: mrp, // Sale Price = MRP
+      purchasePrice: 0,
+      taxRate: taxRate,
+      notes: _notesController.text,
     );
+    Navigator.pop(context, updatedItem);
   }
 }

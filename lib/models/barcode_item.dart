@@ -8,7 +8,7 @@ class BarcodeItem {
   final double mrp;
   final double salePrice;
   final double purchasePrice;
-  final double? gstRate;
+  final double? taxRate;
   final String? unit;
   final String? notes;
   final String status;
@@ -23,7 +23,7 @@ class BarcodeItem {
     required this.mrp,
     required this.salePrice,
     required this.purchasePrice,
-    this.gstRate,
+    this.taxRate,
     this.unit,
     this.notes,
     this.status = 'pending',
@@ -35,17 +35,18 @@ class BarcodeItem {
       itemName: json['name'] ?? json['item_name'] ?? '',
       brand: json['brand'],
       category: json['category'],
-      hsn: json['hsn'],
+      hsn: json['hsn'] ?? json['hsn_code'] ?? json['hsncode'],
       sku: json['sku'],
       mrp: (json['mrp'] as num?)?.toDouble() ?? 0.0,
       salePrice: (json['sale_price'] as num?)?.toDouble() ?? 0.0,
       purchasePrice: (json['purchase_price'] as num?)?.toDouble() ?? 0.0,
-      gstRate: (json['gst_rate'] as num?)?.toDouble(),
+      taxRate: (json['tax_rate'] as num?)?.toDouble() ?? (json['gst_rate'] as num?)?.toDouble(),
       unit: json['unit'],
       notes: json['notes'],
       status: json['status'] ?? 'pending',
     );
   }
+
 
   Map<String, dynamic> toJson() {
     return {
@@ -58,7 +59,7 @@ class BarcodeItem {
       'mrp': mrp,
       'sale_price': salePrice,
       'purchase_price': purchasePrice,
-      'gst_rate': gstRate,
+      'tax_rate': taxRate,
       'unit': unit,
       'notes': notes,
       'status': status,
@@ -74,13 +75,13 @@ class BarcodeItem {
     double? mrp,
     double? salePrice,
     double? purchasePrice,
-    double? gstRate,
+    double? taxRate,
     String? unit,
     String? notes,
     String? status,
   }) {
     return BarcodeItem(
-      barcode: this.barcode,
+      barcode: barcode,
       itemName: itemName ?? this.itemName,
       brand: brand ?? this.brand,
       category: category ?? this.category,
@@ -89,7 +90,7 @@ class BarcodeItem {
       mrp: mrp ?? this.mrp,
       salePrice: salePrice ?? this.salePrice,
       purchasePrice: purchasePrice ?? this.purchasePrice,
-      gstRate: gstRate ?? this.gstRate,
+      taxRate: taxRate ?? this.taxRate,
       unit: unit ?? this.unit,
       notes: notes ?? this.notes,
       status: status ?? this.status,

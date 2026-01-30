@@ -4,14 +4,31 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'core/constants.dart';
 import 'screens/splash_screen.dart';
-import 'screens/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
+  if (AppConstants.supabaseUrl.isEmpty) {
+    runApp(MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Text(
+              'Supabase URL is missing!\nPlease run with:\nflutter run --dart-define-from-file=.env',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.red[700], fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+      ),
+    ));
+    return;
+  }
+  
   await Supabase.initialize(
     url: AppConstants.supabaseUrl,
-    anonKey: AppConstants.supabaseAnonKey,
+    anonKey: AppConstants.supabaseKey,
   );
   
   runApp(
@@ -31,9 +48,9 @@ class EzLaunchApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6366F1),
-          primary: const Color(0xFF6366F1),
-          secondary: const Color(0xFF03DAC6),
+          seedColor: const Color(0xFF2563EB),
+          primary: const Color(0xFF2563EB),
+          secondary: const Color(0xFF38BDF8),
           brightness: Brightness.light,
         ),
         useMaterial3: true,
