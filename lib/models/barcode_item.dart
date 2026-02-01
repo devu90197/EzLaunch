@@ -31,19 +31,19 @@ class BarcodeItem {
 
   factory BarcodeItem.fromJson(Map<String, dynamic> json) {
     return BarcodeItem(
-      barcode: json['barcode'],
-      itemName: json['name'] ?? json['item_name'] ?? '',
-      brand: json['brand'],
-      category: json['category'],
-      hsn: json['hsn'] ?? json['hsn_code'] ?? json['hsncode'],
-      sku: json['sku'],
+      barcode: json['barcode']?.toString() ?? '',
+      itemName: (json['name'] ?? json['item_name'] ?? '').toString(),
+      brand: json['brand']?.toString(),
+      category: json['category']?.toString(),
+      hsn: (json['hsn'] ?? json['hsn_code'] ?? json['hsncode'])?.toString(),
+      sku: json['sku']?.toString(),
       mrp: (json['mrp'] as num?)?.toDouble() ?? 0.0,
       salePrice: (json['sale_price'] as num?)?.toDouble() ?? 0.0,
       purchasePrice: (json['purchase_price'] as num?)?.toDouble() ?? 0.0,
       taxRate: (json['tax_rate'] as num?)?.toDouble() ?? (json['gst_rate'] as num?)?.toDouble(),
-      unit: json['unit'],
-      notes: json['notes'],
-      status: json['status'] ?? 'pending',
+      unit: json['unit']?.toString(),
+      notes: json['notes']?.toString(),
+      status: json['status']?.toString() ?? 'pending',
     );
   }
 
@@ -51,10 +51,10 @@ class BarcodeItem {
   Map<String, dynamic> toJson() {
     return {
       'barcode': barcode,
-      'name': itemName,
+      'item_name': itemName,
       'brand': brand,
       'category': category,
-      'hsn': hsn,
+      'hsn_code': hsn,
       'sku': sku,
       'mrp': mrp,
       'sale_price': salePrice,

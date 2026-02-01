@@ -21,18 +21,22 @@ class SupabaseService {
 
   /// Lookup a barcode in the Product Master (unified source)
   Future<BarcodeItem?> lookupBarcode(String barcode) async {
+    final trimmedBarcode = barcode.trim();
+    if (trimmedBarcode.isEmpty) return null;
+
     try {
       final response = await _libraryClient
           .from('product_master')
           .select()
-          .eq('barcode', barcode)
-          .maybeSingle();
+          .eq('barcode', trimmedBarcode)
+          .limit(1);
 
-      if (response != null) {
-        return BarcodeItem.fromJson(response);
+      if (response != null && (response as List).isNotEmpty) {
+        return BarcodeItem.fromJson(response.first);
       }
       return null;
     } catch (e) {
+      print('DEBUG: lookupBarcode error: $e');
       return null;
     }
   }
@@ -57,7 +61,7 @@ class SupabaseService {
     try {
       print('DEBUG: Starting library batch update for ${items.length} items');
       final data = items.map((item) => {
-        'barcode': item.barcode,
+        'barcode': item.barcode.trim(),
         'item_name': item.itemName,
         'category': item.category,
         'hsn_code': item.hsn,
@@ -175,7 +179,7 @@ class SupabaseService {
       'branch_id': branchId,
       'items': items.map((item) => {
         'item_name': item.itemName,
-        'barcode': item.barcode,
+        'barcode': item.barcode.trim(),
         'unit': item.unit ?? 'pcs',
         'mrp': item.mrp,
         'hsn_code': item.hsn,

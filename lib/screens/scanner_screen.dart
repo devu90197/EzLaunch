@@ -39,8 +39,8 @@ class _ScannerScreenState extends State<ScannerScreen> {
   void _onDetect(BarcodeCapture capture) async {
     if (_isProcessing) return;
 
-    final barcode = capture.barcodes.first.rawValue;
-    if (barcode == null) return;
+    final barcode = capture.barcodes.first.rawValue?.trim();
+    if (barcode == null || barcode.isEmpty) return;
 
     // 1. Check if already in session list
     if (_scannedItems.any((item) => item.barcode == barcode)) {

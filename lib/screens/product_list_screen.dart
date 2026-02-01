@@ -63,9 +63,24 @@ class _ProductListScreenState extends State<ProductListScreen> {
       _searchController.text = barcode;
       _filterProducts(barcode);
       
-      // If nothing found, trigger onboarding
+      // If nothing found locally, check remote database before triggering onboarding
       if (_filteredProducts.isEmpty) {
-        _onboardNewItem(barcode);
+        setState(() => _isLoading = true);
+        final remoteItem = await _supabaseService.lookupBarcode(barcode);
+        setState(() => _isLoading = false);
+
+        if (remoteItem != null) {
+          // Found remotely! Show details directly to avoid pagination issues
+          _showProductDetails(remoteItem.toJson());
+          // Also trigger a background refresh of the full list if needed
+          _fetchProducts(); 
+        } else {
+          // Genuinely not found anywhere
+          _onboardNewItem(barcode);
+        }
+      } else {
+        // Found locally, show details
+        _showProductDetails(_filteredProducts.first);
       }
     }
   }
@@ -598,7 +613,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     const SizedBox(height: 16),
                     Text(_searchQuery.isEmpty ? "No products found" : "No results for '$_searchQuery'", style: GoogleFonts.outfit(color: Colors.grey[500], fontSize: 16)),
                     const SizedBox(height: 24),
-                    if (_searchQuery.isNotEmpty)
+                    if (_searchQuery.isNotEmpty) ...[
                       SizedBox(
                         width: 200,
                         child: OutlinedButton.icon(
@@ -611,6 +626,27 @@ class _ProductListScreenState extends State<ProductListScreen> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: 200,
+                        child: TextButton.icon(
+                          onPressed: () async {
+                              setState(() => _isLoading = true);
+                              final item = await _supabaseService.lookupBarcode(_searchQuery);
+                              setState(() => _isLoading = false);
+                              if (item != null) {
+                                _showProductDetails(item.toJson());
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Not found in Master Library either'))
+                                );
+                              }
+                          },
+                          icon: const Icon(Icons.search_rounded),
+                          label: Text('Search Master Library', style: GoogleFonts.outfit(fontWeight: FontWeight.w600)),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

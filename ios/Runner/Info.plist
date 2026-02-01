@@ -45,6 +45,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs camera access to scan barcodes.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>This app needs Face ID access for secure operator login.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 </dict>
